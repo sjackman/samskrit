@@ -5,6 +5,12 @@ Tools to manipulate SAM and BAM files
 
 Samskrit = Sanskrit + SAM scripts. Get it? Funny!
 
+Tools
+=====
+
+* [samskrit-swap](samskrit-swap):
+	Swap the roles of the query and target sequence
+
 Author
 ======
 

@@ -1,0 +1,66 @@
+#!/usr/local/bin/python
+# Swap the roles of the query and target sequence.
+# Written by Shaun Jackman.
+
+import pysam, string, sys
+
+# CIGAR operations
+M = 0
+I = 1
+D = 2
+N = 3
+S = 4
+H = 5
+P = 6
+EQ = 7
+X = 8
+
+# Return the reverse complement sequence.
+def rc(dna):
+	complements = string.maketrans(
+		'acgtrymkbdhvACGTRYMKBDHV', 'tgcayrkmvhdbTGCAYRKMVHDB')
+	rcseq = dna.translate(complements)[::-1]
+	return rcseq
+
+# Read a FASTA file of the reference.
+fa = pysam.Fastafile(sys.argv[1])
+
+# Write the output SAM file.
+samout = pysam.Samfile('-', 'wh',
+	referencenames = ['NC_021456.1'],
+	referencelengths = [124084])
+
+# Read the input SAM file.
+samin = pysam.Samfile('-', 'r')
+for x in samin.fetch():
+	y = pysam.AlignedRead()
+	y.qname = samin.getrname(x.tid)
+	y.flag = x.flag & (4 | 0x10 | 0x100 | 0x200 | 0x400)
+	y.rname = samout.gettid(x.qname)
+	y.pos = 0
+	y.mapq = x.mapq
+
+	if x.is_reverse:
+		x.cigar = x.cigar[::-1]
+	ycigar = []
+	for i, (op, n) in enumerate(x.cigar):
+		if op == I:
+			ycigar.append((D, n))
+		elif op == D or op == N:
+			ycigar.append((I, n))
+		elif op == S or op == H:
+			if i == 0:
+				y.pos = n
+		else:
+			ycigar.append((op, n))
+	y.cigar = ycigar
+
+	y.mrnm = -1
+	y.mpos = -1
+	y.isize = 0
+
+	y.seq = fa.fetch(y.qname, x.pos, x.aend)
+	if x.is_reverse:
+		y.seq = rc(y.seq)
+
+	samout.write(y)
