@@ -28,15 +28,26 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--version', action='version',
 	version='%(prog)s 0.1\nWritten by Shaun Jackman')
 parser.add_argument('REF', help='the reference FASTA file')
+parser.add_argument('QFAI', help='the query FASTA index (FAI) file')
 args = parser.parse_args()
 
-# Read the FASTA file of the reference.
+# Read the reference FASTA file.
 ref = pysam.Fastafile(args.REF)
+
+# Read the query FASTA index (FAI) file.
+qfai = open(args.QFAI, 'r')
+qnames = []
+qlengths = []
+for line in qfai:
+	name, length, _, _, _ = line.split('\t')
+	qnames.append(name)
+	qlengths.append(int(length))
+qfai.close()
 
 # Write the output SAM file.
 samout = pysam.Samfile('-', 'wh',
-	referencenames = ['NC_021456.1'],
-	referencelengths = [124084])
+	referencenames = qnames,
+	referencelengths = qlengths)
 
 # Read the input SAM file.
 samin = pysam.Samfile('-', 'r')
