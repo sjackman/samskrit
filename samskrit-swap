@@ -29,6 +29,7 @@ parser.add_argument('--version', action='version',
 	version='%(prog)s 0.1\nWritten by Shaun Jackman')
 parser.add_argument('REF', help='the reference FASTA file')
 parser.add_argument('QFAI', help='the query FASTA index (FAI) file')
+parser.add_argument('SAM', help='the SAM file')
 args = parser.parse_args()
 
 # Read the reference FASTA file.
@@ -50,7 +51,7 @@ samout = pysam.Samfile('-', 'wh',
 	referencelengths = qlengths)
 
 # Read the input SAM file.
-samin = pysam.Samfile('-', 'r')
+samin = pysam.Samfile(args.SAM, 'r')
 for x in samin.fetch():
 	y = pysam.AlignedRead()
 	y.qname = samin.getrname(x.tid)
