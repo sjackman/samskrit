@@ -2,7 +2,7 @@
 # Swap the roles of the query and target sequence.
 # Written by Shaun Jackman.
 
-import pysam, string, sys
+import argparse, pysam, string
 
 # CIGAR operations
 M = 0
@@ -22,8 +22,16 @@ def rc(dna):
 	rcseq = dna.translate(complements)[::-1]
 	return rcseq
 
-# Read a FASTA file of the reference.
-fa = pysam.Fastafile(sys.argv[1])
+# Parse the command line arguments
+parser = argparse.ArgumentParser(
+	description='Swap the roles of the query and target sequence')
+parser.add_argument('--version', action='version',
+	version='%(prog)s 0.1\nWritten by Shaun Jackman')
+parser.add_argument('REF', help='the reference FASTA file')
+args = parser.parse_args()
+
+# Read the FASTA file of the reference.
+ref = pysam.Fastafile(args.REF)
 
 # Write the output SAM file.
 samout = pysam.Samfile('-', 'wh',
@@ -59,7 +67,7 @@ for x in samin.fetch():
 	y.mpos = -1
 	y.isize = 0
 
-	y.seq = fa.fetch(y.qname, x.pos, x.aend)
+	y.seq = ref.fetch(y.qname, x.pos, x.aend)
 	if x.is_reverse:
 		y.seq = rc(y.seq)
 
