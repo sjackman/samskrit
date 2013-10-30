@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 # Swap the roles of the query and target sequence.
 # Written by Shaun Jackman.
 
