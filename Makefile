@@ -1,6 +1,6 @@
 prefix=/usr/local
 bindir=$(prefix)/bin
-bin_SCRIPTS = samskrit-swap
+bin_SCRIPTS = samskrit-identity samskrit-swap
 
 all:
 

@@ -1,0 +1,17 @@
+#!/bin/bash
+# Calculate the identity of each alignment.
+# Written by Shaun Jackman @sjackman.
+
+set -eu
+
+printf 'n\tnm\tidentity\tfile\n'
+
+for bam; do
+	nm=`samtools view $bam \
+		|sed -nE 's/.*NM:i:([0-9]*).*/\1/p' \
+		|awk '{x+=$1} END {print x}'`
+
+	n=`samtools depth $bam |awk '{x+=$3} END {print x}'`
+
+	printf "$n\t$nm\t%0.3f\t$bam\n" `bc -l <<<"1-$nm/$n"`
+done

@@ -8,6 +8,8 @@ Samskrit = Sanskrit + SAM scripts. Get it? Funny!
 Tools
 =====
 
+* [samskrit-identity](samskrit-identity):
+	Calculate the identity of each alignment
 * [samskrit-swap](samskrit-swap):
 	Swap the roles of the query and target sequence
 
